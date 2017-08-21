@@ -18,6 +18,15 @@ const APP_ID = undefined;
 
 var cal = 'https://calendar.google.com/calendar/ical/9aqoirufc0h1mrihk78us5mlgs%40group.calendar.google.com/public/basic.ics';
 
+var languageStrings = {
+   'en': {
+      'translation': {
+         'HELP_MESSAGE': 'Welcome to Mustang Band Reminders. You can ask a question like, what are my upcoming band events?...\ 
+         You will then be told the next event on the Mustang Band calendar.',
+         'STOP_MESSAGE': 'Goodbye! 8. 0. 7.'
+      }
+   }
+};
 
 function removeTags(str) {
    if (str) {
@@ -88,7 +97,7 @@ const handlers = {
    'AMAZON.HelpIntent': function () {
       const speechOutput = this.t('HELP_MESSAGE');
       const reprompt = this.t('HELP_MESSAGE');
-      this.emit(':ask', speechOutput, reprompt);
+      this.emit(':tell', speechOutput, reprompt);
    },
    'AMAZON.CancelIntent': function () {
       this.emit(':tell', this.t('STOP_MESSAGE'));
@@ -101,6 +110,7 @@ const handlers = {
 exports.handler = function (event, context) {
    alexa = Alexa.handler(event, context);
    alexa.APP_ID = APP_ID;
+   alexa.resources = languageStrings;
    alexa.registerHandlers(handlers);
    alexa.execute();
 };
