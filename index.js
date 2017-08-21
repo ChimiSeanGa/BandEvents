@@ -21,9 +21,8 @@ var cal = 'https://calendar.google.com/calendar/ical/9aqoirufc0h1mrihk78us5mlgs%
 var languageStrings = {
    'en': {
       'translation': {
-         'HELP_MESSAGE': 'Welcome to Mustang Band Reminders. You can ask a question like, what are my upcoming band events?...\ 
-         You will then be told the next event on the Mustang Band calendar.',
-         'STOP_MESSAGE': 'Goodbye! 8. 0. 7.'
+         'HELP_MESSAGE': 'Welcome to Mustang Band Reminders. You can ask a question like, what are my upcoming band events?... You will then be told the next event on the Mustang Band calendar.',
+         'STOP_MESSAGE': 'Goodbye! 8-oh-7.'
       }
    }
 };
