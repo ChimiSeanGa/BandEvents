@@ -33,28 +33,34 @@ function removeTags(str) {
    }
 }
 
+function getEventData(ev) {
+   var eventData = {
+      summary: removeTags(ev.summary),
+      location: removeTags(ev.location),
+      description: removeTags(ev.description),
+      start: ev.start
+   };
+
+   return eventData;
+}
+
 function getUpcomingEvents(callback) {
-   var events = new Array();
    var today = new Date();
 
    ical.fromURL(cal, {}, function(err, data) {
+      var nextEvent = getEventData(data[0]);
+
       for (var k in data) {
          if (data.hasOwnProperty(k)) {
             var ev = data[k];
 
-            var eventData = {
-               summary: removeTags(ev.summary),
-               location: removeTags(ev.location),
-               description: removeTags(ev.description),
-               start: ev.start
-            };
+            var eventData = getEventData(ev);
 
-            if (eventData.summary != undefined && eventData.start >= today)
-               events.push(eventData);
+            if (eventData.summary != undefined && eventData.start >= today && eventData.start < nextEvent.start)
+               nextEvent = eventData;
          }
       }
 
-      var nextEvent = getNextEvent(events);
       callback(nextEvent);
    });
 }
