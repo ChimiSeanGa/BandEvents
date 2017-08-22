@@ -21,8 +21,11 @@ var cal = 'https://calendar.google.com/calendar/ical/9aqoirufc0h1mrihk78us5mlgs%
 var languageStrings = {
    'en': {
       'translation': {
-         'HELP_MESSAGE': 'Welcome to Mustang Band Reminders. You can ask a question like, what are my upcoming band events?... You will then be told the next event on the Mustang Band calendar.',
-         'STOP_MESSAGE': 'Goodbye! 8-oh-7.'
+         'WELCOME_MESSAGE': 'Welcome to Mustang Band Reminders. What would you like to know?',
+         'HELP_MESSAGE': 'Welcome to Mustang Band Reminders. You can ask a question like, what are my upcoming band events?... This will let you know what the next Mustang Band event is. What would you like to know?',
+         'REPROMPT_MESSAGE': 'Sorry, I didn\'t get that. What would you like to know?',
+         'STOP_MESSAGE': 'Goodbye! 8-oh-7.',
+         '807_MESSAGE': 'The band always wins!'
       }
    }
 };
@@ -33,31 +36,25 @@ function removeTags(str) {
    }
 }
 
-function getEventData(ev) {
-   var eventData = {
-      summary: removeTags(ev.summary),
-      location: removeTags(ev.location),
-      description: removeTags(ev.description),
-      start: ev.start
-   };
-
-   return eventData;
-}
-
 function getUpcomingEvents(callback) {
    var today = new Date();
+   var nextEvent = undefined;
 
    ical.fromURL(cal, {}, function(err, data) {
-      var nextEvent = getEventData(data[0]);
-
       for (var k in data) {
          if (data.hasOwnProperty(k)) {
             var ev = data[k];
 
-            var eventData = getEventData(ev);
+            var eventData = {
+               summary: removeTags(ev.summary),
+               location: removeTags(ev.location),
+               description: removeTags(ev.description),
+               start: ev.start
+            };
 
-            if (eventData.summary != undefined && eventData.start >= today && eventData.start < nextEvent.start)
-               nextEvent = eventData;
+            if (eventData.summary != undefined && eventData.start >= today)
+               if (nextEvent == undefined || eventData.start < nextEvent.start)
+                  nextEvent = eventData;
          }
       }
 
@@ -78,7 +75,7 @@ function getNextEvent(eventList) {
 
 const handlers = {
    'LaunchRequest': function () {
-      this.emit('BandEvents');
+      this.emit(':ask', this.t('WELCOME_MESSAGE'));
    },
    'BandEventsIntent': function () {
       this.emit('BandEvents');
@@ -99,10 +96,16 @@ const handlers = {
          alexa.emit(':tellWithCard', speechOutput, 'Mustang Band', speechOutput);
       });
    },
+   'BAWIntent': function() {
+      this.emit('BAW');
+   },
+   'BAW': function() {
+      this.emit(':tell', this.t('807_MESSAGE'));
+   },
    'AMAZON.HelpIntent': function () {
       const speechOutput = this.t('HELP_MESSAGE');
-      const reprompt = this.t('HELP_MESSAGE');
-      this.emit(':tell', speechOutput, reprompt);
+      const reprompt = this.t('REPROMPT_MESSAGE');
+      this.emit(':ask', speechOutput, reprompt);
    },
    'AMAZON.CancelIntent': function () {
       this.emit(':tell', this.t('STOP_MESSAGE'));
